@@ -10,15 +10,17 @@ import java.net.URL;
 public class Wget2 implements Runnable {
     private final String url;
     private final int speed;
+    private final String filename;
 
-    public Wget2(String url, int speed) {
+    public Wget2(String url, int speed, String filename) {
         this.url = url;
         this.speed = speed;
+        this.filename = filename;
     }
 
     @Override
     public void run() {
-        var file = new File("tmp.xml");
+        var file = new File(filename);
         try (var input = new URL(url).openStream();
              var output = new FileOutputStream(file)) {
             var dataBuffer = new byte[512];
@@ -30,12 +32,14 @@ public class Wget2 implements Runnable {
             while ((bytesRead = input.read(dataBuffer, 0, dataBuffer.length)) != -1) {
                 output.write(dataBuffer, 0, bytesRead);
                 totalBytesRead += bytesRead;
-                elapsedTime = System.currentTimeMillis() - startTime;
-                double downloadSpeedKbps = (totalBytesRead * 8.0) / (elapsedTime * speed);
-                if (downloadSpeedKbps > speed) {
-                    long sleepTime = (long) ((totalBytesRead * 8.0) / (speed * 128)) - elapsedTime;
-                    if (sleepTime > 0) {
-                        Thread.sleep(sleepTime);
+                if (totalBytesRead >= speed) {
+                    elapsedTime = System.currentTimeMillis() - startTime;
+                    double downloadSpeedKbps = (totalBytesRead) / (elapsedTime * speed);
+                    if (downloadSpeedKbps > speed) {
+                        long sleepTime = (long) ((totalBytesRead) / (speed)) - elapsedTime;
+                        if (sleepTime > 0) {
+                            Thread.sleep(sleepTime);
+                        }
                     }
                 }
             }
@@ -54,10 +58,15 @@ public class Wget2 implements Runnable {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        if (args.length < 3) {
+            System.out.println("Usage: java Wget2 <URL> <speed> <filename>");
+            return;
+        }
         String url = args[0];
         int speed = Integer.parseInt(args[1]);
+        String filename = args[2];
         if (isValidURL(url) && speed > 0) {
-            Thread wget = new Thread(new Wget2(url, speed));
+            Thread wget = new Thread(new Wget2(url, speed, filename));
             wget.start();
             wget.join();
         }
