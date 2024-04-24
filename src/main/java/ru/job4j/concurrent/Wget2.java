@@ -32,13 +32,15 @@ public class Wget2 implements Runnable {
             while ((bytesRead = input.read(dataBuffer, 0, dataBuffer.length)) != -1) {
                 output.write(dataBuffer, 0, bytesRead);
                 totalBytesRead += bytesRead;
-                if (totalBytesRead >= speed) {
-                    elapsedTime = System.currentTimeMillis() - startTime;
+                elapsedTime = System.currentTimeMillis() - startTime;
+                if (elapsedTime > 0) {
                     double downloadSpeedKbps = (totalBytesRead) / (elapsedTime * speed);
                     if (downloadSpeedKbps > speed) {
-                        long sleepTime = (long) ((totalBytesRead) / (speed)) - elapsedTime;
+                        long sleepTime = ((totalBytesRead) / (speed)) - elapsedTime;
                         if (sleepTime > 0) {
                             Thread.sleep(sleepTime);
+                            totalBytesRead = 0;
+                            startTime = System.currentTimeMillis();
                         }
                     }
                 }
@@ -59,8 +61,7 @@ public class Wget2 implements Runnable {
 
     public static void main(String[] args) throws InterruptedException {
         if (args.length < 3) {
-            System.out.println("Usage: java Wget2 <URL> <speed> <filename>");
-            return;
+            throw new IllegalArgumentException("Usage: java Wget2 <URL> <speed> <filename>");
         }
         String url = args[0];
         int speed = Integer.parseInt(args[1]);
