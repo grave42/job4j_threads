@@ -32,16 +32,13 @@ public class Wget2 implements Runnable {
             while ((bytesRead = input.read(dataBuffer, 0, dataBuffer.length)) != -1) {
                 output.write(dataBuffer, 0, bytesRead);
                 totalBytesRead += bytesRead;
-                elapsedTime = System.currentTimeMillis() - startTime;
-                if (elapsedTime > 0) {
-                    double downloadSpeedKbps = (totalBytesRead) / (elapsedTime * speed);
-                    if (downloadSpeedKbps > speed) {
+                if (totalBytesRead >= speed) {
+                    elapsedTime = System.currentTimeMillis() - startTime;
+                    if (elapsedTime < 1000) {
                         long sleepTime = ((totalBytesRead) / (speed)) - elapsedTime;
-                        if (sleepTime > 0) {
-                            Thread.sleep(sleepTime);
-                            totalBytesRead = 0;
-                            startTime = System.currentTimeMillis();
-                        }
+                        Thread.sleep(sleepTime);
+                        totalBytesRead = 0;
+                        startTime = System.currentTimeMillis();
                     }
                 }
             }
