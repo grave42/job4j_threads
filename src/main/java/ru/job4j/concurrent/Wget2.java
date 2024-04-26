@@ -37,7 +37,7 @@ public class Wget2 implements Runnable {
                     totalBytesRead = 0;
                     startTime = System.currentTimeMillis();
                     if (elapsedTime < 1000) {
-                        Thread.sleep(elapsedTime / speed);
+                        Thread.sleep((1000 - elapsedTime) * (1024 / speed));
                     }
                 }
             }
