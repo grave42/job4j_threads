@@ -36,13 +36,15 @@ public class Wget2 implements Runnable {
                     elapsedTime = System.currentTimeMillis() - startTime;
                     if (elapsedTime < 1000) {
                         Thread.sleep(1000 - elapsedTime);
+                    }
                         totalBytesRead = 0;
                         startTime = System.currentTimeMillis();
                     }
                 }
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
