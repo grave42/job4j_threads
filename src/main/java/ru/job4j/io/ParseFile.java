@@ -10,16 +10,24 @@ public class ParseFile {
         this.file = file;
     }
 
-    public String getContent(Predicate<Character> filter) throws IOException {
-        StringBuilder output = new StringBuilder();
-        try (Reader reader = new FileReader(file)) {
+    public String getContent() throws IOException {
+        return getContentByPredicate(data -> true);
+    }
+
+    public String getContentWithoutUnicode() throws IOException {
+        return getContentByPredicate(data -> data < 0x80);
+    }
+
+    public String getContentByPredicate(Predicate<Integer> predicate) throws IOException {
+        try (InputStream input = new FileInputStream(file)) {
+            StringBuilder output = new StringBuilder();
             int data;
-            while ((data = reader.read()) != -1) {
-                if (filter.test((char) data)) {
+            while ((data = input.read()) != -1) {
+                if (predicate.test(data)) {
                     output.append((char) data);
                 }
             }
+            return output.toString();
         }
-        return output.toString();
     }
 }
