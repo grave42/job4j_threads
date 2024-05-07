@@ -8,18 +8,20 @@ import java.util.List;
 public class ThreadPool {
     private final List<Thread> threads = new LinkedList<>();
     private final SimpleBlockingQueue<Runnable> tasks = new SimpleBlockingQueue<>(3);
-    private volatile boolean isRunning = true;
 
     public ThreadPool() {
         int size = Runtime.getRuntime().availableProcessors();
         for (int i = 0; i < size; i++) {
             Thread thread = new Thread(() -> {
-                while (isRunning || !tasks.isEmpty()) {
-                    try {
-                        tasks.poll();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+                try {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        Runnable task = tasks.poll();
+                        if (task != null) {
+                            task.run();
+                        }
                     }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             });
             threads.add(thread);
@@ -27,20 +29,25 @@ public class ThreadPool {
         }
     }
 
-    public synchronized void work(Runnable job) throws InterruptedException {
+    public void work(Runnable job) throws InterruptedException {
         tasks.offer(job);
-        tasks.notifyAll();
     }
 
-    public synchronized void shutdown() {
-        isRunning = false;
-        tasks.notifyAll();
+    public void shutdown() throws InterruptedException {
         for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            thread.interrupt();
         }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        ThreadPool pool = new ThreadPool();
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+            pool.work(() -> {
+                System.out.println("Задача " + finalI + " выполнена потоком " + Thread.currentThread().getName());
+            });
+        }
+        Thread.sleep(1000);
+        pool.shutdown();
     }
 }
