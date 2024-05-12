@@ -18,7 +18,7 @@ class RolColSumTest {
                 {4, 5, 6},
                 {7, 8, 9}
         };
-        RolColSum.Sums[] result = sum(matrix);
+        Sums[] result = sum(matrix);
         int exeptedRow3 = 24;
         int exeptedCol3 = 18;
         assertEquals(exeptedRow3, result[2].getRowSum());
@@ -32,8 +32,8 @@ class RolColSumTest {
                 {4, 5, 6},
                 {7, 8, 9}
         };
-        CompletableFuture<RolColSum.Sums[]> futureSums = asyncSum(matrix);
-        RolColSum.Sums[] result = futureSums.get();
+        CompletableFuture<Sums[]> futureSums = asyncSum(matrix);
+        Sums[] result = futureSums.get();
         int exeptedRow3 = 24;
         int exeptedCol3 = 18;
         assertEquals(exeptedRow3, result[2].getRowSum());
