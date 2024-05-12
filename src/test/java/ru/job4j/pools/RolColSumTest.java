@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static ru.job4j.pools.RolColSum.asyncSum;
 import static ru.job4j.pools.RolColSum.sum;
 
@@ -19,10 +19,12 @@ class RolColSumTest {
                 {7, 8, 9}
         };
         Sums[] result = sum(matrix);
-        int exeptedRow3 = 24;
-        int exeptedCol3 = 18;
-        assertEquals(exeptedRow3, result[2].getRowSum());
-        assertEquals(exeptedCol3, result[2].getColSum());
+        Sums[] expected = {
+                new Sums(6, 12),
+                new Sums(15, 15),
+                new Sums(24, 18)
+        };
+        assertArrayEquals(expected, result);
     }
 
     @Test
@@ -34,9 +36,11 @@ class RolColSumTest {
         };
         CompletableFuture<Sums[]> futureSums = asyncSum(matrix);
         Sums[] result = futureSums.get();
-        int exeptedRow3 = 24;
-        int exeptedCol3 = 18;
-        assertEquals(exeptedRow3, result[2].getRowSum());
-        assertEquals(exeptedCol3, result[2].getColSum());
+        Sums[] expected = {
+                new Sums(6, 12),
+                new Sums(15, 15),
+                new Sums(24, 18)
+        };
+        assertArrayEquals(expected, result);
     }
 }
