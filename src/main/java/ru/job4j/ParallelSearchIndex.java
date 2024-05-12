@@ -20,9 +20,14 @@ public class ParallelSearchIndex<T> extends RecursiveTask<Integer> {
     @Override
     protected Integer compute() {
         if ((end - start) <= 10) {
-            return lineFindIndex();
+            for (int i = start; i < end; i++) {
+                if (array[i].equals(valueToSearch)) {
+                    return i;
+                }
+            }
+            return -1;
         }
-        int mid = start + (end - start) / 2;
+        int mid = (start + end) / 2;
         ParallelSearchIndex<T> leftSearch = new ParallelSearchIndex<>(array, valueToSearch, start, mid);
         ParallelSearchIndex<T> rightSearch = new ParallelSearchIndex<>(array, valueToSearch, mid, end);
         leftSearch.fork();
@@ -30,30 +35,17 @@ public class ParallelSearchIndex<T> extends RecursiveTask<Integer> {
         int rightResult = rightSearch.join();
         int leftResult = leftSearch.join();
 
-        return joinResult(rightResult, leftResult, mid);
+        if (leftResult != -1) {
+            return leftResult;
+        }
+        if (rightResult != -1) {
+            return rightResult;
+        }
+        return -1;
     }
 
     public static <T> Integer findIndex(T[] array, T value) {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         return forkJoinPool.invoke(new ParallelSearchIndex<>(array, value, 0, array.length));
-    }
-
-    private int lineFindIndex() {
-        for (int i = 0; i < array.length; i++) {
-            if (array[i].equals(valueToSearch)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int joinResult(int rightResult, int leftResult, int mid) {
-        if (leftResult != -1) {
-            return leftResult;
-        } else if (rightResult != -1) {
-            return mid + rightResult;
-        } else {
-            return -1;
-        }
     }
 }

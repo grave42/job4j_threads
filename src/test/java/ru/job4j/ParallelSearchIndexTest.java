@@ -21,7 +21,7 @@ class ParallelSearchIndexTest {
         String[] array = {"da", "lol", "ok", "neok", "ok", "ok", "ok", "ok", "ok", "ok", "ok", "net", "ok"};
         String value = "net";
         int expectedIndex = 11;
-        int actualIndex = findIndex(array, value);
+        int actualIndex = ParallelSearchIndex.findIndex(array, value);
         assertEquals(expectedIndex, actualIndex);
     }
 
@@ -30,7 +30,7 @@ class ParallelSearchIndexTest {
         Integer[] array = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         int value = 222;
         int expectedIndex = -1;
-        int actualIndex = findIndex(array, value);
+        int actualIndex = ParallelSearchIndex.findIndex(array, value);
         assertEquals(expectedIndex, actualIndex);
     }
 
@@ -42,7 +42,7 @@ class ParallelSearchIndexTest {
         }
         int value = 999999;
         int expectedIndex = 999999;
-        int actualIndex = findIndex(array, value);
+        int actualIndex = ParallelSearchIndex.findIndex(array, value);
         assertEquals(expectedIndex, actualIndex);
     }
 
