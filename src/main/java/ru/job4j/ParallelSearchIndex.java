@@ -35,17 +35,15 @@ public class ParallelSearchIndex<T> extends RecursiveTask<Integer> {
         int rightResult = rightSearch.join();
         int leftResult = leftSearch.join();
 
-        if (leftResult != -1) {
-            return leftResult;
-        }
-        if (rightResult != -1) {
-            return rightResult;
-        }
-        return -1;
+        return joinResult(leftResult, rightResult);
     }
 
     public static <T> Integer findIndex(T[] array, T value) {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         return forkJoinPool.invoke(new ParallelSearchIndex<>(array, value, 0, array.length));
+    }
+
+    private int joinResult(int leftResult, int rightResult) {
+        return  Math.max(leftResult, rightResult);
     }
 }
