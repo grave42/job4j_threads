@@ -20,12 +20,7 @@ public class ParallelSearchIndex<T> extends RecursiveTask<Integer> {
     @Override
     protected Integer compute() {
         if ((end - start) <= 10) {
-            for (int i = start; i < end; i++) {
-                if (array[i].equals(valueToSearch)) {
-                    return i;
-                }
-            }
-            return -1;
+            return lineFindIndex();
         }
         int mid = (start + end) / 2;
         ParallelSearchIndex<T> leftSearch = new ParallelSearchIndex<>(array, valueToSearch, start, mid);
@@ -35,7 +30,7 @@ public class ParallelSearchIndex<T> extends RecursiveTask<Integer> {
         int rightResult = rightSearch.join();
         int leftResult = leftSearch.join();
 
-        return joinResult(leftResult, rightResult);
+        return Math.max(leftResult, rightResult);
     }
 
     public static <T> Integer findIndex(T[] array, T value) {
@@ -43,7 +38,12 @@ public class ParallelSearchIndex<T> extends RecursiveTask<Integer> {
         return forkJoinPool.invoke(new ParallelSearchIndex<>(array, value, 0, array.length));
     }
 
-    private int joinResult(int leftResult, int rightResult) {
-        return  Math.max(leftResult, rightResult);
+    private int lineFindIndex() {
+        for (int i = start; i < end; i++) {
+            if (array[i].equals(valueToSearch)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
